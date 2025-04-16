@@ -11,6 +11,8 @@ const VideoDownloader = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+
+  // https://rapidapi.com/uzapishop/api/instagram-downloader-download-instagram-videos-stories1/playground/apiendpoint_c7151864-948b-464e-802c-29a953b92720
   const handleDownload = async () => {
     setLoading(true);
     setError("");
@@ -34,10 +36,12 @@ const VideoDownloader = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] flex items-center justify-center p-4">
+      <div className="absolute w-72 h-72 bg-purple-500 rounded-full blur-3xl opacity-30 top-10 left-80"></div>
+      <div className="absolute w-96 h-96 bg-pink-500 rounded-full blur-2xl opacity-20 bottom-10 right-80"></div>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
         <Card className="w-full max-w-xl p-6 shadow-2xl bg-white/10 backdrop-blur-sm text-white rounded-2xl">
           <CardContent>
-            <h1 className="text-3xl font-bold mb-4 text-center">Social Video Downloader</h1>
+            <h1 className="text-3xl font-bold mb-4 text-center">Social Video/Reel Downloader</h1>
             <p className="text-sm text-center mb-6 text-gray-300">Paste any Facebook or Instagram video URL to download</p>
             <Input
               type="text"
