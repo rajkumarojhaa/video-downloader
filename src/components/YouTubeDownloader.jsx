@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { useNavigate } from "react-router-dom";
 import {
   Select,
   SelectItem,
@@ -11,10 +12,13 @@ import {
   SelectContent,
   SelectValue,
 } from "@/components/ui/select";
+import { motion } from "framer-motion";
+import { ArrowRight, DownloadCloud, RefreshCcw, Home } from "lucide-react";
 
 
 // https://rapidapi.com/officialofun-C-wpfpix418/api/youtube-video-and-shorts-downloader/playground/apiendpoint_b4535862-4f2d-4648-bd0a-005c694c5e06
 const YouTubeDownloader = () => {
+  const navigate = useNavigate();
   const [videoUrl, setVideoUrl] = useState("");
   const [downloadLinks, setDownloadLinks] = useState(null);
   const [quality, setQuality] = useState("720p");
@@ -87,75 +91,124 @@ const YouTubeDownloader = () => {
   };
 
   const handleQualityDownload = () => {
-    const index = getQualityIndex(quality);
-    const selectedUrl = downloadLinks?.[index]?.url;
-    if (selectedUrl) {
-      window.open(selectedUrl, "_blank");
-    } else {
-      alert("Selected quality not available");
-    }
+  const index = getQualityIndex(quality);
+  const selectedUrl = downloadLinks?.[index]?.url;
 
-    const link = document.createElement("a");
-    link.href = selectedUrl;
-    link.download = `youtube-video-${quality}.mp4`; // just a suggested filename
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+  if (selectedUrl) {
+    navigate("/download", {
+      state: {
+        url: selectedUrl,
+        quality,
+      },
+    });
+  } else {
+    alert("Selected quality not available");
+  }
+};
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] flex items-center justify-center p-4">
-        {/* Decorative Blurred Backgrounds */}
-      <div className="absolute w-72 h-72 bg-purple-500 rounded-full blur-3xl opacity-30 top-10 right-10"></div>
-      <div className="absolute w-96 h-96 bg-pink-500 rounded-full blur-2xl opacity-20 bottom-10 left-10"></div>
-      <Card className="w-full max-w-xl p-6 shadow-2xl bg-white/10 backdrop-blur-md border border-white/20">
-        <CardContent className="flex flex-col gap-4">
-          <h2 className="text-2xl font-bold text-white text-center">
-            YouTube Video Downloader
-          </h2>
-          <Label className="text-white">Enter YouTube Link:</Label>
-          <Input
-            type="text"
-            value={videoUrl}
-            onChange={(e) => setVideoUrl(e.target.value)}
-            placeholder="https://www.youtube.com/watch?v=XYZ123"
-            className="bg-white/10 text-white placeholder:text-white/60 border border-white/30"
-          />
-          <Button
-            onClick={handleDownload}
-            disabled={loading}
-            className="bg-purple-600 hover:bg-purple-700 text-white"
-          >
-            {loading ? "Fetching..." : "Get Download Links"}
-          </Button>
+    <div className="relative min-h-screen bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] flex items-center justify-center p-4 overflow-hidden text-white">
+      {/* Decorative blurred gradients */}
+      <div className="absolute w-80 h-80 bg-purple-600 rounded-full blur-3xl opacity-20 top-0 right-0 animate-pulse"></div>
+      <div className="absolute w-96 h-96 bg-pink-500 rounded-full blur-3xl opacity-25 bottom-0 left-0 animate-pulse"></div>
 
-          {downloadLinks && (
+      <motion.div
+        className="w-full max-w-xl z-10"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <Card className="w-full p-6 shadow-xl bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl">
+          <CardContent className="flex flex-col gap-6">
+            <div className="text-center space-y-1">
+              <h2 className="text-3xl font-extrabold text-white tracking-wide">
+                🚀 YouTube Video Downloader
+              </h2>
+              <p className="text-sm text-gray-300">
+                Paste a YouTube video link to generate downloadable formats
+              </p>
+            </div>
+
             <div className="flex flex-col gap-3">
-              <Label className="text-white">Choose Quality:</Label>
-              <Select value={quality} onValueChange={setQuality}>
-                <SelectTrigger className="bg-white/10 border border-white/30 text-white">
-                  <SelectValue placeholder="Select quality" />
-                </SelectTrigger>
-                <SelectContent className="bg-white/10 text-white">
-                  {["1080p", "720p", "480p", "360p", "240p", "144p" , "mp3"].map(
-                    (q) => (
+              <Label className="text-white text-sm">🎥 YouTube Link</Label>
+              <Input
+                type="text"
+                value={videoUrl}
+                onChange={(e) => setVideoUrl(e.target.value)}
+                placeholder="e.g., https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                className="bg-white/10 text-white placeholder:text-white/60 border border-white/30 focus:ring-2 focus:ring-purple-500"
+              />
+              <div className="flex gap-2 mt-2">
+                <Button
+                  onClick={handleDownload}
+                  disabled={loading}
+                  className="bg-purple-600 hover:bg-purple-700 text-white flex-1"
+                >
+                  {loading ? (
+                    <>
+                      <RefreshCcw className="animate-spin mr-2 h-4 w-4" />
+                      Fetching...
+                    </>
+                  ) : (
+                    <>
+                      <ArrowRight className="mr-2 h-4 w-4" />
+                      Get Download Links
+                    </>
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setVideoUrl("")}
+                  className="border border-white/20 text-slate-800 hover:bg-white/10"
+                >
+                  Clear
+                </Button>
+              </div>
+            </div>
+
+            {downloadLinks && (
+              <motion.div
+                className="flex flex-col gap-4 mt-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <Label className="text-white text-sm">📽️ Choose Quality</Label>
+                <Select value={quality} onValueChange={setQuality}>
+                  <SelectTrigger className="bg-white/10 border border-white/30 text-white focus:ring-2 focus:ring-green-400">
+                    <SelectValue placeholder="Select quality" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#1a1a2e] text-white border border-white/20 rounded-lg shadow-lg">
+                    {["1080p", "720p", "480p", "360p", "240p", "144p", "mp3"].map((q) => (
                       <SelectItem value={q} key={q}>
                         {q}
                       </SelectItem>
-                    )
-                  )}
-                </SelectContent>
-              </Select>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Button
+                  onClick={handleQualityDownload}
+                  className="bg-green-500 hover:bg-green-600 text-white mt-2"
+                >
+                  <DownloadCloud className="mr-2 h-4 w-4" />
+                  Download {quality || "Video"}
+                </Button>
+              </motion.div>
+            )}
+
+            <div className="flex justify-center pt-4">
               <Button
-                onClick={handleQualityDownload}
-                className="bg-green-500 hover:bg-green-600 text-white"
+                variant="ghost"
+                onClick={() => navigate("/")}
+                className="text-sm text-white/70 hover:text-slate-800"
               >
-                Download {quality}
+                <Home className="mr-2 h-4 w-4" />
+                Back to Home
               </Button>
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 };
